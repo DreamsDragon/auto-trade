@@ -8,9 +8,27 @@ from datetime import datetime
 
 
 Time = datetime
+Price = float
+Quantity = int
 
 
 @dataclass
 class Ticker:
     symbol: str
     name: str
+
+
+@dataclass
+class Quote:
+    ticker: Ticker
+    time: Time
+    open_price: Price
+    high: Price
+    low: Price
+    cloes: Price
+    price: Price
+    volume: Quantity
+
+    @property
+    def open(self):
+        return self.open_price
