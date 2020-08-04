@@ -12,21 +12,21 @@ class AbstractMarketAPI(ABC):
     """
 
     @abstractmethod
-    def get_quote(ticker: Ticker):
+    def get_quote(self, ticker: Ticker):
         """
             Get the live quote of a ticker
         """
         pass
 
     @abstractmethod
-    def get_historic_quote(ticker: Ticker, start: Time, end: Time):
+    def get_historic_quote(self, ticker: Ticker, start: Time, end: Time):
         """
             Get historic quotes in the time period
         """
         pass
 
     @abstractmethod
-    def get_all_stocks():
+    def get_all_stocks(self):
         """
             Return list of all available stocks
         """

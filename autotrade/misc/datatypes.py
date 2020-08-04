@@ -12,5 +12,5 @@ Time = datetime
 
 @dataclass
 class Ticker:
-    ticker_symbol: str
+    symbol: str
     name: str
