@@ -20,8 +20,21 @@ def probe_nyse(url: str):
 
 
 class NYSE_MARKET_API(AbstractMarketAPI):
-    def __init__(self):
+    def __init__(
+        self, listing_file=None, listing_file_delimiter=None,
+    ):
         self.key = os.environ["ALPHA_VANTAGE_KEY"]
+        self.all_tickers = {}
+        if (listing_file != None) and (listing_file_delimiter != None):
+            self._read_listing(listing_file, listing_file_delimiter)
+
+    def _read_listing(self, listing_file, listing_file_delimiter):
+        with open(listing_file) as f:
+            for line in f:
+                split_line = line.split(listing_file_delimiter)
+                symbol = split_line[0]
+                name = split_line[1]
+                self.all_tickers[name] = Ticker(symbol, name)
 
     def get_quote(self, ticker: Ticker):
         """
@@ -74,7 +87,7 @@ class NYSE_MARKET_API(AbstractMarketAPI):
         """
             Return list of all available stocks
         """
-        pass
+        return self.all_tickers
 
     def _adjust_interval(self, interval, minimum=1, maximum=60):
         if interval > maximum:
