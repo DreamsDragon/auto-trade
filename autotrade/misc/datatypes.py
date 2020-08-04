@@ -25,7 +25,7 @@ class Quote:
     open_price: Price
     high: Price
     low: Price
-    cloes: Price
+    close: Price
     price: Price
     volume: Quantity
 
