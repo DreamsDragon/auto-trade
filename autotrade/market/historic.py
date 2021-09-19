@@ -15,6 +15,13 @@ class HistoricMarket(BaseMarket):
     """
 
     def __init__(self, start: datetime, end: datetime, interval: str = "5m") -> None:
+        """
+            Initialize the historic market object
+        Args:
+            start (datetime): Time to start the market at
+            end (datetime): Time to end the market at. Note that price after this time is same as end time
+            interval (str, optional): The interval between ticks. Defaults to "5m".
+        """
         super().__init__()
         self.start = start
         self.end = end
@@ -24,15 +31,27 @@ class HistoricMarket(BaseMarket):
         self.counter = 0
 
     def _up_counter(self):
+        """
+        Increase the ticker
+        """
         self.counter += 1
 
     def __post_init__(self):
+        """
+        Do some post initialization stuff
+        """
         if self.interval in ["5m", "15m"]:
             time_diff = self.end - self.start
             if time_diff.days >= 6:
                 self.end = self.start + timedelta(days=6)
 
     def _get_data(self, ticker: Ticker):
+        """
+            Get the required historic data
+        Args:
+            ticker (Ticker): Ticker to get the data for
+
+        """
         try:
             yticker = yf.Ticker(ticker.symbol)
             hist_data = yticker.history(
@@ -42,10 +61,18 @@ class HistoricMarket(BaseMarket):
             )
             return hist_data
         except:
-            raise
             return None
 
-    def get_info(self, ticker: Ticker):
+    def get_info(self, ticker: Ticker) -> Quote:
+        """
+            Get the current quote
+
+        Args:
+            ticker (Ticker): Ticker to get the data for
+
+        Returns:
+            Quote: Quote with the required data
+        """
         self.trade_data.setdefault(ticker, self._get_data(ticker))
         if self.trade_data[ticker] is not None:
             df = self.trade_data.get(ticker)
@@ -57,7 +84,16 @@ class HistoricMarket(BaseMarket):
             return Quote(ticker, price, volume, quote_datetime)
         return None
 
-    def get_historic_data(self, ticker, nb_past_quotes: int) -> list[Quote]:
+    def get_historic_data(self, ticker: Ticker, nb_past_quotes: int) -> list[Quote]:
+        """
+            Get the historic data for the ticker
+        Args:
+            ticker (Ticker): Ticker to get the data for
+            nb_past_quotes (int): Number of past ticks to return
+
+        Returns:
+            list[Quote]: list of historic quotes
+        """
         old_counter = int(self.counter)
         data_to_return = []
         for _ in range(nb_past_quotes):
