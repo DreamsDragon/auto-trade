@@ -22,7 +22,12 @@ class Ticker:
 class Order:
     ticker: Ticker  # ticker to buy/sell
     quantity: quantity_type  # How much to buy sell
+    unit_price: price_type  # Per unit price
     type: str  # Type of order (buy or sell)
+
+    @property
+    def price(self):
+        return self.quantity * self.unit_price
 
 
 @dataclass

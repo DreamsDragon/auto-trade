@@ -18,7 +18,7 @@ class BaseBrain(ABC):
         super().__init__()
 
     @abstractmethod
-    def decide(self, *args, **kwargs) -> tuple(price_type, quantity_type):
+    def act(self, *args, **kwargs):
         """
         Decide if we buy/sell/hold and how much to buy
         """
