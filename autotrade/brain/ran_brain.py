@@ -21,31 +21,45 @@ class RandomBrain(BaseBrain):
 
     def act(self):
         tickers_to_observe = self._get_what_to_observe()
+        moves = [1, 2, 3]
         for ticker in tickers_to_observe:
             credits = self._get_credits()
             portfolio = self._get_portfolio()
-            quote = self._get_info_about(ticker)
-            price = quote.price
-            for _ in shuffle([1, 2, 3]):
+            order = None
+            shuffle(moves)
+            for _ in moves:
+                if _ == 1:
+                    quote = self._get_info_about(ticker,"buy")
+                    price = quote.price
+                else:
+                    quote = self._get_info_about(ticker,"sell")
+                    price = quote.price
                 if _ == 1 and price * self.chunk_size <= credits:
                     order = Order(ticker, self.chunk_size, price, "buy")
+                    break
                 elif _ == 2 and ticker in portfolio:
                     # Sell
+                    quote = self._get_info_about(ticker,"sell")
+                    price = quote.price
                     order = Order(ticker, self.chunk_size, price, "sell")
+                    break
                 elif _ == 3:
                     # 3 is Hold
-                    order = None
-                if order is not None:
-                    self.execute_order(order)
+                    break
+            if order is not None:
+                self.execute_order(order)
 
     def execute_order(self, order: Order):
         for x in self.traders:
             x.trade(order)
+            credits = self._get_credits()
+            print("Executed {0} order for {1} units of {2} at {3} per unit, remaining credits {4}".format(order.type,order.ticker.symbol,order.quantity,order.unit_price,credits))
 
     def _get_portfolio(self):
         full_port = {}
         for x in self.traders:
             full_port.update(x.get_portfolio())
+        return full_port
 
     def _get_credits(self):
         return min([x.get_credits() for x in self.traders])
@@ -53,7 +67,7 @@ class RandomBrain(BaseBrain):
     def _get_what_to_observe(self):
         tickers_to_observe = []
         for eye in self.eyes:
-            tickers_to_observe.exted(eye.observe())
+            tickers_to_observe.extend(eye.observe())
         return tickers_to_observe
 
     def _get_info_about(self, ticker, type: int):

@@ -3,7 +3,7 @@
 """
 from abc import ABC,abstractmethod
 
-from autotrade import Order
+from autotrade.misc import Order
 
 class BaseTrader(ABC):
     """
@@ -17,5 +17,5 @@ class BaseTrader(ABC):
             Finish the given Order
         Args:
             order (Order): Order to finish
-       """
-       pass
+        """
+        pass

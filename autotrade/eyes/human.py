@@ -20,10 +20,10 @@ class HumanEyes(BaseEyes):
         """
         super().__init__()
         self.tickers = []
-        for sym, ticker_name in tickers:
+        for sym, ticker_name in tickers.items():
             self.tickers.append(Ticker(sym, ticker_name))
 
-    def observe(self, *args, **kwargs) -> list(Ticker):
+    def observe(self, *args, **kwargs) -> list[Ticker]:
         """
             Returns the list of tickers to observe
 

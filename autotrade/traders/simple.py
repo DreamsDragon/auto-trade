@@ -23,13 +23,13 @@ class SimpleTrader(BaseTrader):
             nb_owned = self.portfolio.get(order.ticker, 0)
             if nb_owned >= 0:
                 self._credits += order.unit_price * min(nb_owned, order.quantity)
-                self.portfolio[order.ticker] += nb_owned
+                self.portfolio[order.ticker] -= nb_owned
                 if self.portfolio[order.ticker] == 0:
                     self.portfolio.pop(order.ticker)
 
         elif order.type == "buy":
             # Buy stocks
-            self._credits += price
+            self._credits -= price
             self.portfolio.setdefault(order.ticker, 0)
             self.portfolio[order.ticker] += order.quantity
 
