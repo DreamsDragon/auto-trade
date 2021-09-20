@@ -102,6 +102,21 @@ class HistoricMarket(BaseMarket):
         self.counter = old_counter
         return data_to_return[::-1]
 
+    def evaluate_portfolio(self,portfolio:dict)->price_type:
+        """
+            Evaulate the current market value of the given portfolio
+
+        Args:
+            portfolio (dict): Key is ticker and value is quantity owned
+
+        Returns:
+            price_type: Overall value of the portfolio
+        """
+        value = 0
+        for ticker,qty in portfolio.items():
+            quote = self.get_info(ticker)
+            value+=qty*quote.price
+        return value
 
 if __name__ == "__main__":
 

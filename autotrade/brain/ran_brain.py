@@ -52,8 +52,8 @@ class RandomBrain(BaseBrain):
     def execute_order(self, order: Order):
         for x in self.traders:
             x.trade(order)
-            credits = self._get_credits()
-            print("Executed {0} order for {1} units of {2} at {3} per unit, remaining credits {4}".format(order.type,order.ticker.symbol,order.quantity,order.unit_price,credits))
+            value = self.get_value()
+            print("Executed {0} order for {1} units of {2} at {3} per unit, remaining credits {4}".format(order.type,order.ticker.symbol,order.quantity,order.unit_price,value))
 
     def _get_portfolio(self):
         full_port = {}
@@ -84,3 +84,12 @@ class RandomBrain(BaseBrain):
                     # Buy at lowest price
                     quote = new_quote
         return quote
+    
+    def get_value(self)->price_type:
+        """
+            Returns the value of owned by the brain
+        """
+        credits = self._get_credits()
+        port = self._get_portfolio()
+        port_value = max([m.evaluate_portfolio(port) for m in self.markets])
+        return credits+port_value

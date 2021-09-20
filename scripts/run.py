@@ -18,7 +18,7 @@ if __name__=="__main__":
 
     brain = RandomBrain(eyes,markets,traders)
 
-    total_counters = 1
+    total_counters = 100
     current_counter = 0
 
     while True:
