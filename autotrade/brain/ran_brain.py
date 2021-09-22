@@ -29,31 +29,41 @@ class RandomBrain(BaseBrain):
             shuffle(moves)
             for _ in moves:
                 if _ == 1:
-                    quote = self._get_info_about(ticker,"buy")
+                    quote = self._get_info_about(ticker, "buy")
                     price = quote.price
                 else:
-                    quote = self._get_info_about(ticker,"sell")
+                    quote = self._get_info_about(ticker, "sell")
                     price = quote.price
                 if _ == 1 and price * self.chunk_size <= credits:
                     order = Order(ticker, self.chunk_size, price, "buy")
                     break
                 elif _ == 2 and ticker in portfolio:
                     # Sell
-                    quote = self._get_info_about(ticker,"sell")
+                    quote = self._get_info_about(ticker, "sell")
                     price = quote.price
                     order = Order(ticker, self.chunk_size, price, "sell")
                     break
                 elif _ == 3:
                     # 3 is Hold
+                    order = Order(ticker, self.chunk_size, 0, "hold")
                     break
             if order is not None:
                 self.execute_order(order)
 
     def execute_order(self, order: Order):
         for x in self.traders:
-            x.trade(order)
+            if order.type not in ["hold"]:
+                x.trade(order)
             value = self.get_value()
-            print("Executed {0} order for {1} units of {2} at {3} per unit, remaining credits {4}".format(order.type,order.ticker.symbol,order.quantity,order.unit_price,value))
+            print(
+                "Executed {0} order for {1} units of {2} at {3} per unit, remaining credits {4}".format(
+                    order.type,
+                    order.ticker.symbol,
+                    order.quantity,
+                    order.unit_price,
+                    value,
+                )
+            )
 
     def _get_portfolio(self):
         full_port = {}
@@ -84,12 +94,12 @@ class RandomBrain(BaseBrain):
                     # Buy at lowest price
                     quote = new_quote
         return quote
-    
-    def get_value(self)->price_type:
+
+    def get_value(self) -> price_type:
         """
-            Returns the value of owned by the brain
+        Returns the value of owned by the brain
         """
         credits = self._get_credits()
         port = self._get_portfolio()
         port_value = max([m.evaluate_portfolio(port) for m in self.markets])
-        return credits+port_value
+        return credits + port_value

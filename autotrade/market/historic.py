@@ -73,10 +73,11 @@ class HistoricMarket(BaseMarket):
         Returns:
             Quote: Quote with the required data
         """
-        self.trade_data.setdefault(ticker, self._get_data(ticker))
+        if ticker not in self.trade_data:
+            self.trade_data[ticker] = self._get_data(ticker)
         if self.trade_data[ticker] is not None:
             df = self.trade_data.get(ticker)
-            needed_index = max(0, min(self.counter, df.shape[0]))
+            needed_index = max(0, min(self.counter, df.shape[0] - 1))
             row = df.iloc[[needed_index]]
             quote_datetime = row.index.to_pydatetime()[0]
             price = price_type(row["Close"])
@@ -99,10 +100,12 @@ class HistoricMarket(BaseMarket):
         for _ in range(nb_past_quotes):
             data_to_return.append(self.get_info(ticker))
             self.counter -= 1
+            if self.counter == 0:
+                break
         self.counter = old_counter
         return data_to_return[::-1]
 
-    def evaluate_portfolio(self,portfolio:dict)->price_type:
+    def evaluate_portfolio(self, portfolio: dict) -> price_type:
         """
             Evaulate the current market value of the given portfolio
 
@@ -113,10 +116,11 @@ class HistoricMarket(BaseMarket):
             price_type: Overall value of the portfolio
         """
         value = 0
-        for ticker,qty in portfolio.items():
+        for ticker, qty in portfolio.items():
             quote = self.get_info(ticker)
-            value+=qty*quote.price
+            value += qty * quote.price
         return value
+
 
 if __name__ == "__main__":
 
