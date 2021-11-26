@@ -50,7 +50,7 @@ class RandomBrain(BaseBrain):
             if order is not None:
                 self.execute_order(order)
 
-    def execute_order(self, order: Order):
+    def execute_order(self, order: Order) -> int:
         for x in self.traders:
             if order.type not in ["hold"]:
                 x.trade(order)

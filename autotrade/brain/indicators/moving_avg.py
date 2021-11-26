@@ -15,6 +15,36 @@ def exp_mv_average(values, smoothing=2):
     return ema
 
 
+class MA(BaseIndicator):
+    def __init__(self, nb_ticks: int) -> None:
+        """
+            Init function for Exponential Moving Averages
+        Args:
+            nb_ticks (int): Period to calculate the ema for
+        """
+        self.nb_ticks = nb_ticks
+        super().__init__()
+
+    def get_indication(self, *args, **kwargs) -> Indication:
+        return None
+
+    def _calculate_mv_avg(self, quotes: list[Quote]) -> price_type:
+        """
+            Calculate the moving average of the given period
+        Args:
+            quotes (list[Quote]): [description]
+
+        Returns:
+            price_type: SMA value
+        """
+        sorted_quotes = sorted(quotes, key=lambda x: x.quote_datetime, reverse=True)[
+            : self.nb_ticks
+        ][::-1]
+        values = [q.price for q in sorted_quotes]
+        sma = sum(values) / len(values)
+        return sma
+
+
 class EMA(BaseIndicator):
     def __init__(self, nb_ticks: int) -> None:
         """
@@ -45,10 +75,34 @@ class EMA(BaseIndicator):
         return ema
 
 
+class GoldenCross(BaseIndicator):
+    def __init__(self, low=13, high=48):
+        self.low_ema = EMA(low)
+        self.high_ema = EMA(high)
+
+    def get_indication(
+        self, ticker: Ticker, market: BaseMarket, *args, **kwargs
+    ) -> Indication:
+        indication = self._get_signal(ticker, market)
+        return Indication(indication)
+
+    def _get_signal(self, ticker: Ticker, market: BaseMarket):
+        past_quotes = market.get_historic_data(ticker, 48)
+        if len(past_quotes) < 48:
+            return 3
+        low = self.low_ema._calculate_mv_avg(past_quotes)
+        high = self.high_ema._calculate_mv_avg(past_quotes)
+        if low > high:
+            return 1
+        elif low < high:
+            return 2
+        return 3
+
+
 class MACD(BaseIndicator):
     def __init__(self, signal_size=9) -> None:
         self.ema_12 = EMA(12)
-        self.ema_24 = EMA(24)
+        self.ema_24 = EMA(26)
         self.signal_size = signal_size
         self.past_macd = {}
         super().__init__()

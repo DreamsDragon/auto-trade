@@ -80,7 +80,7 @@ class HistoricMarket(BaseMarket):
             needed_index = max(0, min(self.counter, df.shape[0] - 1))
             row = df.iloc[[needed_index]]
             quote_datetime = row.index.to_pydatetime()[0]
-            price = price_type(row["Close"])
+            price = price_type((row["Close"] + row["High"] + row["Low"]) / 3.0)
             volume = volume_type(row["Volume"])
             return Quote(ticker, price, volume, quote_datetime)
         return None
